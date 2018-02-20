@@ -1,0 +1,10 @@
+class Header(object):
+    accept = 'Accept'
+    content_type = 'Content-Type'
+    authorization = 'Authorization'
+    query = 'query'
+    row_id = 'rowId'
+    start_time = 'startTime'
+    end_time = 'endTime'
+    requested_data_points = 'requestedDataPoints'
+    max_data_points = 'maxDataPoints'

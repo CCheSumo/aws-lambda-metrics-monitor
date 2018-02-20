@@ -1,4 +1,8 @@
 class Header(object):
+    x_sumo_source = 'X-Sumo-Name'
+    x_sumo_host = 'X-Sumo-Host'
+    x_sumo_category = 'X-Sumo-Category'
+    content_encoding = 'Content-Encoding'
     accept = 'Accept'
     content_type = 'Content-Type'
     authorization = 'Authorization'

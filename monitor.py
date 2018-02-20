@@ -6,6 +6,7 @@ from config import Config
 from timer import Timer
 from sessions import Sessions
 from performance import Performance
+from query import Query
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -17,7 +18,7 @@ class Monitor(object):
         self.timer = Timer(Config.request_interval, self.task)
         self.sessions = Sessions()
         self.performance = Performance()
-        self.url = url +  Config.endpoint
+        self.url = url + Config.endpoint
         self.auth = (access_id, access_key)
         self.timestamp = int(time.time())
         self.start()
@@ -57,8 +58,9 @@ class Monitor(object):
         logger.debug("sending request %s ", body)
         self.sessions.add(index, body)
         perf_start = time.time()
-        response = requests.post(self.url, data=body, headers=Config.headers, auth=self.auth)
+        response = requests.post(self.url, data=body, headers=Config.query_headers, auth=self.auth)
         perf_end = time.time()
-        self.performance.add(index, perf_end - perf_start)
+        query = Query(perf_start, perf_end, body)
+        self.performance.add(index, query)
         self.sessions.delete(index)
-        logger.info("finishing request %d %s %s with %s in %f seconds", index, str(Config.headers), body, str(response), (perf_end - perf_start))
+        logger.info("finishing request %d %s %s with %s in %f seconds", index, str(Config.query_headers), body, str(response), (perf_end - perf_start))

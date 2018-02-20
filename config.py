@@ -2,7 +2,9 @@ from header import Header
 
 
 class Config(object):
-
+    x_sumo_source = 'metris_sla_aws_lambda_source'
+    x_sumo_host = 'metrics_sla_aws_lambda_host'
+    x_sumo_category = 'metrics_sla_lambda_category'
     http_method = 'POST'
     accept = 'application/json'
     content_type = 'application/json'
@@ -16,7 +18,14 @@ class Config(object):
     request_interval = 1
     number_requests = 60
 
-    headers = {
+    query_headers = {
         Header.content_type: content_type,
         Header.accept: accept
+    }
+
+    send_headers = {
+        Header.content_encoding: 'deflate',
+        Header.x_sumo_source: 'metris_sla_aws_lambda_source',
+        Header.x_sumo_host: 'metrics_sla_aws_lambda_host',
+        Header.x_sumo_category: 'metrics_sla_lambda_category'
     }

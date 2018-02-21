@@ -7,6 +7,7 @@ from timer import Timer
 from sessions import Sessions
 from performance import Performance
 from query import Query
+from query import Index
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -51,17 +52,22 @@ class Monitor(object):
         else:
             self.stop()
 
-    def send(self):
-        index = self.sessions.completed
-        end_time = int(self.timestamp + index) * 1000
-        body = self.build_body(end_time - Config.time_range, end_time)
+    def query(self, time_range):
+        index = Index(self.sessions.completed, time_range)
+        end_time = int(self.timestamp + self.sessions.completed) * 1000
+        body = self.build_body(end_time - time_range, end_time)
         logger.debug("sending request %s ", body)
         self.sessions.add(index, body)
         perf_start = time.time()
         response = requests.post(self.url, data=body, headers=Config.query_headers, auth=self.auth)
         perf_end = time.time()
-        query = Query(perf_start, perf_end, body)
+        query = Query(perf_start, perf_end, body, time_range)
         self.performance.add(index, query)
         self.sessions.delete(index)
-        logger.info("finishing request %d %s %s with %s in %f seconds", index, str(Config.query_headers), body, str(response), query.latency())
+        logger.debug("finishing request %d %s %s with %s in %f seconds", index, str(Config.query_headers), body, str(response), (perf_end - perf_start))
 
+    def send(self):
+        logger.debug("sending request with time_ranges %s", str(Config.query_ranges))
+        for time_range in Config.query_ranges:
+            self.query(time_range)
+        logger.debug("finishing request with time_ranges %s", str(Config.query_ranges))

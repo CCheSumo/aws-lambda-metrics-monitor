@@ -17,14 +17,15 @@ class Feeder(object):
         return zlib.compress(body.encode('utf-8'))
 
     def build_log_body(self, key, query):
-        return "request_number=%d %s start_time=%f latency=%f" % \
-               (int(key),
+        return "request_number=%d request_time_range=%d %s start_time=%f latency=%f" % \
+               (int(key.index),
+                (int(key.time_range)),
                 Config.metric_query + "_latency",
                 query.start_time,
                 query.latency())
 
     def build_metric_body(self, key, query):
-        return "%s  %f %d" % (Config.metric_query + "_latency", query.latency(), int(query.start_time))
+        return "%s time_range=%d  %f %d" % (Config.metric_query + "_latency", int(key.time_range), query.latency(), int(query.start_time))
 
     def send_logs(self):
         body = [self.build_log_body(key, query) for key, query in self.performance.latency.items()]

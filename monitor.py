@@ -63,4 +63,5 @@ class Monitor(object):
         query = Query(perf_start, perf_end, body)
         self.performance.add(index, query)
         self.sessions.delete(index)
-        logger.info("finishing request %d %s %s with %s in %f seconds", index, str(Config.query_headers), body, str(response), (perf_end - perf_start))
+        logger.info("finishing request %d %s %s with %s in %f seconds", index, str(Config.query_headers), body, str(response), query.latency())
+

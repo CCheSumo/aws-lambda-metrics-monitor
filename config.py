@@ -23,9 +23,12 @@ class Config(object):
         Header.accept: accept
     }
 
-    send_headers = {
+    send_logs_headers = {
         Header.content_encoding: 'deflate',
         Header.x_sumo_source: 'metris_sla_aws_lambda_source',
         Header.x_sumo_host: 'metrics_sla_aws_lambda_host',
         Header.x_sumo_category: 'metrics_sla_lambda_category'
     }
+
+    send_metrics_headers = dict(send_logs_headers)
+    send_metrics_headers.update({Header.content_type: 'application/vnd.sumologic.carbon2'})

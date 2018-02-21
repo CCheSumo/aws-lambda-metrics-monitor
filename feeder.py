@@ -2,7 +2,6 @@ import logging
 import zlib
 from botocore.vendored import requests
 from config import Config
-from header import Header
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -17,19 +16,30 @@ class Feeder(object):
     def encode(self, body):
         return zlib.compress(body.encode('utf-8'))
 
-    def build_body(self, key, query):
-        return "request_number=%d %s  %s=%s %s=%s %s=%s start_time=%f latency=%f" % \
+    def build_log_body(self, key, query):
+        return "request_number=%d %s start_time=%f latency=%f" % \
                (int(key),
-                Config.metric_query,
-                Header.x_sumo_category, Config.x_sumo_category,
-                Header.x_sumo_host, Config.x_sumo_host,
-                Header.x_sumo_source, Config.x_sumo_source,
+                Config.metric_query + "_latency",
                 query.start_time,
                 query.latency())
 
-    def send(self):
-        body = [self.build_body(key, query) for key, query in self.performance.latency.items()]
+    def build_metric_body(self, key, query):
+        return "%s  %f %d" % (Config.metric_query + "_latency", query.latency(), int(query.start_time))
+
+    def send_logs(self):
+        body = [self.build_log_body(key, query) for key, query in self.performance.latency.items()]
         body_str = '\n'.join(body)
-        logger.info("sending request %s", body)
-        response = requests.post(self.url, data=self.encode(body_str), headers=Config.send_headers)
-        logger.info("finishing request %s with %s", body, str(response))
+        logger.info("sending logs request %s", body)
+        response = requests.post(self.url, data=self.encode(body_str), headers=Config.send_logs_headers)
+        logger.info("finishing logs request %s with %s", body, str(response))
+
+    def send_metrics(self):
+        body = [self.build_metric_body(key, query) for key, query in self.performance.latency.items()]
+        body_str = '\n'.join(body)
+        logger.info("sending metrics request %s", body)
+        response = requests.post(self.url, data=self.encode(body_str), headers=Config.send_metrics_headers)
+        logger.info("finishing metrics request %s with %s", body, str(response))
+
+    def send(self):
+        self.send_logs()
+        self.send_metrics()

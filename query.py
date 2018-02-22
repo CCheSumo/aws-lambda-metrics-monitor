@@ -18,8 +18,7 @@ class Query(object):
         return int(self.time_range / (self.quantization * 1000))
 
     def availability(self):
-        size = len(self.data_points)
-        if size > 0 and self.latency() <= Config.sla_latency_max:
+        if len(self.data_points) > 0:
             return 100.0
         else:
             return 0.0

@@ -14,8 +14,7 @@ class Config(object):
     requested_data_points = 600
     max_data_points = 800
     # 5 sec, 30 sec, 1 min, 1h, 24h
-    query_ranges = [5000, 30000, 60000, 3600000]
-    sla_latency_max = 60000
+    query_ranges = [5000, 30000, 60000, 3600000, 86400000]
     sleep_interval = 0.1
     request_interval = 1
     number_requests = 60

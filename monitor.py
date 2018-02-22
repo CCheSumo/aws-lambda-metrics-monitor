@@ -61,13 +61,18 @@ class Monitor(object):
         perf_start = time.time()
         response = requests.post(self.url, data=body, headers=Config.query_headers, auth=self.auth)
         perf_end = time.time()
-        query = Query(perf_start, perf_end, body, time_range)
-        self.performance.add(index, query)
+        results = response.json()
+        data_points = results['response'][0]['results'][0]['datapoints']['value']
+        quantization = results['queryInfo']['actualQuantizationInSecs']
+        query = Query(perf_start, perf_end, body, time_range, data_points, quantization)
+        self.performance.add_query(index, query)
+
         self.sessions.delete(index)
-        logger.debug("finishing request %d %s %s with %s in %f seconds", index, str(Config.query_headers), body, str(response), (perf_end - perf_start))
+        logger.debug("finishing request (%d, %d) %s %s with %s in %f seconds", index.index, index.time_range, str(Config.query_headers), body, str(response), (perf_end - perf_start))
 
     def send(self):
         logger.debug("sending request with time_ranges %s", str(Config.query_ranges))
+        self.sessions.complete()
         for time_range in Config.query_ranges:
             self.query(time_range)
         logger.debug("finishing request with time_ranges %s", str(Config.query_ranges))

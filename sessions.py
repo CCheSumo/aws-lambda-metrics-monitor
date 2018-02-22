@@ -6,7 +6,10 @@ class Sessions(object):
 
     def add(self, key, val):
         self.pending[key] = val
-        self.completed += 1
 
     def delete(self, key):
         del self.pending[key]
+
+    def complete(self):
+        self.completed += 1
+

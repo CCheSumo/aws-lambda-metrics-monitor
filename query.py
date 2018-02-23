@@ -59,7 +59,6 @@ class Query(object):
     def data_completeness(self):
         return (len(self.data_points) / self.max_data_points()) * 100
 
-
 class Index(object):
     def __init__(self, index, time_range):
         self.index = index

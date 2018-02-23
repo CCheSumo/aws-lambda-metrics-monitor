@@ -15,6 +15,8 @@ def lambda_handler(event, context):
     monitor = Monitor(event['query_url'], event['access_id'], event['access_key'])
     while not monitor.done():
         time.sleep(Config.sleep_interval)
+    logger.info('finished monitor query')
     feeder = Feeder(event['send_url'], monitor.performance)
     feeder.send()
+    logger.info('finished monitor send')
     return "finished lambda_handler with id %s" % id

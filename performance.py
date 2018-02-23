@@ -1,7 +1,7 @@
 class Performance(object):
 
     def __init__(self):
-        self.latency = {}
+        self.query = {}
 
-    def add(self, key, val):
-        self.latency[key] = val
+    def add_query(self, key, val):
+        self.query[key] = val

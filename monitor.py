@@ -62,8 +62,14 @@ class Monitor(object):
         response = requests.post(self.url, data=body, headers=Config.query_headers, auth=self.auth)
         perf_end = time.time()
         results = response.json()
-        data_points = results['response'][0]['results'][0]['datapoints']['value']
-        quantization = results['queryInfo']['actualQuantizationInSecs']
+        try:
+            data_points = results['response'][0]['results'][0]['datapoints']['value']
+            quantization = results['queryInfo']['actualQuantizationInSecs']
+        except Exception as e:
+            logger.warning("Metrics sla monitor query exception %s" % str(e))
+            data_points = []
+            quantization = 1
+
         query = Query(perf_start, perf_end, body, time_range, data_points, quantization)
         self.performance.add_query(index, query)
 

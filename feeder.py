@@ -10,8 +10,9 @@ logger.setLevel(logging.INFO)
 
 class Feeder(object):
 
-    def __init__(self, url, performance):
+    def __init__(self, url, deployment, performance):
         self.url = url
+        self.deployment = deployment
         self.performance = performance
 
     def encode(self, body):
@@ -19,15 +20,16 @@ class Feeder(object):
 
 
     def build_log_body(self, key, metric, start_time, value):
-        return "request_number=%d request_time_range=%d start_time=%f %s=%f" % \
-               (int(key.index),
+        return "deployment=%s request_number=%d request_time_range=%d start_time=%f %s=%f" % \
+               (self.deployment,
+                int(key.index),
                 (int(key.time_range)),
                 int(start_time),
                 metric,
                 value)
 
     def build_metric_body(self, key, metric, start_time, value):
-        return "metric=%s time_range=%d  %f %d" % (metric, int(key.time_range), value, int(start_time))
+        return "metric=%s time_range=%d deployment=%s  %f %d" % (metric, int(key.time_range), self.deployment, value, int(start_time))
 
     def send_logs(self):
         query_latency_body = [self.build_log_body(key, Metric.query_latency, query.start_time, query.latency()) for key, query in self.performance.query.items()]
